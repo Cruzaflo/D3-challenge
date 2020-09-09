@@ -31,3 +31,43 @@ function circleGetRadius(){
 }
 
 circleGetRadius()
+
+
+
+// Axes labeld
+svg.append("g").attr("class", "xaxisText")
+
+//will allow us to select the group without excess code stored in a variable
+let xaxisText = d3.select(".xaxisText")
+
+function xaxisTextRefresh(){
+    xaxisText.attr("transform", `translate(${(width - labelArea)/ 2 + labelArea}, ${height - margin - textPaddingBottom})`)
+}
+
+xaxisTextRefresh()
+
+//
+xaxisText
+    .append("text")
+    .attr("y", -26)
+    .attr("data-name", "poverty")
+    .attr("data-axis", "x")
+    .attr("class", "activeText active x")
+    .text("In Povert (%)")
+
+//age
+xaxisText
+    .append("text")
+    .attr("y", 0)
+    .attr("data-name", "age")
+    .attr("class", "activeText inactive x")
+    .text("Age (Media)")
+
+//Income
+xaxisText
+    .append("text")
+    .attr("y", 26)
+    .attr("data-name", "income")
+    .attr("data-axis", "x")
+    .attr("class", "activeText inactive x")
+    .text("Household Income (Media")
