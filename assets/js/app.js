@@ -44,7 +44,7 @@ function xaxisTextRefresh(){
 
 xaxisTextRefresh()
 
-// //
+//poverty
 xaxisText
     .append("text")
     .attr("y", -26)
@@ -53,24 +53,6 @@ xaxisText
     .attr("class", "activeText active x")
     .text("In Poverty (%)")
 
-// // //age
-// xaxisText
-//     .append("text")
-//     .attr("y", 0)
-//     .attr("data-name", "age")
-//     .attr("class", "activeText inactive x")
-//     .text("Age (Media)")
-
-// // //Income
-// xaxisText
-//     .append("text")
-//     .attr("y", 26)
-//     .attr("data-name", "income")
-//     .attr("data-axis", "x")
-//     .attr("class", "activeText inactive x")
-//     .text("Household Income (Media")
-
-// //left axis
 let leftTextX = margin + textPaddingLeft 
 let leftTextY = (height + labelArea) /2 -labelArea
 
@@ -83,25 +65,6 @@ function yaxisTextRefresh(){
 }
 
 yaxisTextRefresh()
-
-// yaxisText
-//     obesity
-//     .append("text")
-//     .attr("y", -26)
-//     .attr("data-name", "obesity")
-//     .attr("data-axis", "y")
-//     .attr("class", "activeText active y")
-//     .text("Obese (%)")
-
-// yaxisText
-//     smokes
-//     .append("text")
-//     .attr("y", 0)
-//     .attr("data-name", "Smokes")
-//     .attr("data-axis", "y")
-//     .attr("class", "activeText inactive y")
-//     .text("Smokes (%)")
-
 yaxisText
     //healthcare
     .append("text")
@@ -169,8 +132,10 @@ function visualize(theData){
         .attr("class", "yAxis")
         .attr("transform", "translate(" + (margin + labelArea) + ", 0)")
     
-    var theCircles = svg.selectAll("g theCircles").data(theData).enter()
 
+    //scatter circles
+    var theCircles = svg.selectAll("g theCircles").data(theData).enter()
+    //circle positions
     theCircles  
         .append("circle")
         .attr("cx", function(d){
@@ -183,21 +148,16 @@ function visualize(theData){
         .attr("class", function(d){
             return "stateCircle " + d.abbr
         })
-    
+    //circle labels
     theCircles
         .append("text")
-        // We return the abbreviation to .text, which makes the text the abbreviation.
         .text(function(d) {
             return d.abbr;
         })
-        // Now place the text using our scale.
         .attr("dx", function(d) {
             return xScale(d[curX]);
         })
         .attr("dy", function(d) {
-            // When the size of the text is the radius,
-            // adding a third of the radius to the height
-            // pushes it into the middle of the circle.
             return yScale(d[curY]) + circleRadius / 2.5;
         })
         .attr("font-size", circleRadius)
