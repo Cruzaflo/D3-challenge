@@ -14,11 +14,11 @@ let textPaddingBottom = 40;
 let textPaddingLeft = 40;
 
 let svg = d3
-        .select("#scatter")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("class", "chart")
+    .select("#scatter")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("class", "chart")
 
 let circleRadius;
 function circleGetRadius(){
@@ -51,41 +51,41 @@ xaxisText
     .attr("data-name", "poverty")
     .attr("data-axis", "x")
     .attr("class", "activeText active x")
-    .text("In Povert (%)")
+    .text("In Poverty (%)")
 
-// //age
-xaxisText
-    .append("text")
-    .attr("y", 0)
-    .attr("data-name", "age")
-    .attr("class", "activeText inactive x")
-    .text("Age (Media)")
+// // //age
+// xaxisText
+//     .append("text")
+//     .attr("y", 0)
+//     .attr("data-name", "age")
+//     .attr("class", "activeText inactive x")
+//     .text("Age (Media)")
 
-// //Income
-xaxisText
-    .append("text")
-    .attr("y", 26)
-    .attr("data-name", "income")
-    .attr("data-axis", "x")
-    .attr("class", "activeText inactive x")
-    .text("Household Income (Media")
+// // //Income
+// xaxisText
+//     .append("text")
+//     .attr("y", 26)
+//     .attr("data-name", "income")
+//     .attr("data-axis", "x")
+//     .attr("class", "activeText inactive x")
+//     .text("Household Income (Media")
 
 // //left axis
-// let leftTextX = margin + textPaddingLeft 
-// let leftTextY = (height + labelArea) /2 -labelArea
+let leftTextX = margin + textPaddingLeft 
+let leftTextY = (height + labelArea) /2 -labelArea
 
-// svg.append("g").attr("class", "yaxisText")
+svg.append("g").attr("class", "yaxisText")
 
-// let yaxisText = d3.select(".yaxisText")
+let yaxisText = d3.select(".yaxisText")
 
-// function yaxisTextRefresh(){
-//     yaxisText.attr("transform", `translate(${(leftTextX)}, ${leftTextY}) rotate(-90)`)
-// }
+function yaxisTextRefresh(){
+    yaxisText.attr("transform", `translate(${(leftTextX)}, ${leftTextY}) rotate(-90)`)
+}
 
-// yaxisTextRefresh()
+yaxisTextRefresh()
 
 // yaxisText
-//     //obesity
+//     obesity
 //     .append("text")
 //     .attr("y", -26)
 //     .attr("data-name", "obesity")
@@ -94,26 +94,121 @@ xaxisText
 //     .text("Obese (%)")
 
 // yaxisText
-//     //smokes
+//     smokes
 //     .append("text")
 //     .attr("y", 0)
 //     .attr("data-name", "Smokes")
 //     .attr("data-axis", "y")
 //     .attr("class", "activeText inactive y")
 //     .text("Smokes (%)")
-// yaxisText
-//     //healthcare
-//     .append("text")
-//     .attr("y", 26)
-//     .attr("data-name", "Healthcare")
-//     .attr("data-axis", "y")
-//     .attr("class", "activeText inactive y")
-//     .text("Lack Healthcare (%)")
+
+yaxisText
+    //healthcare
+    .append("text")
+    .attr("y", 26)
+    .attr("data-name", "Healthcare")
+    .attr("data-axis", "y")
+    .attr("class", "activeText active y")
+    .text("Lack Healthcare (%)")
+
+d3.csv("assets/data/data.csv").then(function(data){
+    visualize(data)
+})
+
+function visualize(theData){
+    var curX = "poverty"
+    var curY = "healthcare"
+
+    var xMin
+    var xMax
+    var yMin
+    var yMax
+
+    function xMinMax(){
+        xMin = d3.min(theData, function(d) {
+            return parseFloat(d[curX]) * 0.90
+        })
+
+        xMax = d3.max(theData, function(d){
+            return parseFloat(d[curX]) * 1.10
+        })
+    }
+
+    function yMinMax(){
+        yMin = d3.min(theData, function(d){
+            return parseFloat(d[curY]) * 0.90
+        })
+
+        yMax = d3.max(theData, function(d){
+            return parseFloat(d[curY]) * 1.10
+        })
+    }
+
+    xMinMax()
+    yMinMax()
+
+    var xScale = d3
+        .scaleLinear()
+        .domain([xMin, xMax])
+        .range([margin + labelArea, width - margin])
+    var yScale = d3
+        .scaleLinear()
+        .domain([yMin, yMax])
+        .range([height - margin - labelArea, margin])
+    var xAxis = d3.axisBottom(xScale)
+    var yAxis = d3.axisLeft(yScale)
+
+    svg
+        .append("g")
+        .call(xAxis)
+        .attr("class", "xAxis")
+        .attr("transform", `translate(0, ${height - margin - labelArea})`)
+    svg 
+        .append("g")
+        .call(yAxis)
+        .attr("class", "yAxis")
+        .attr("transform", "translate(" + (margin + labelArea) + ", 0)")
+    
+    var theCircles = svg.selectAll("g theCircles").data(theData).enter()
+
+    theCircles  
+        .append("circle")
+        .attr("cx", function(d){
+            return xScale(d[curX])
+        })
+        .attr("cy", function(d){
+            return yScale(d[curY])
+        })
+        .attr("r", circleRadius)
+        .attr("class", function(d){
+            return "stateCircle " + d.abbr
+        })
+    
+    theCircles
+        .append("text")
+        // We return the abbreviation to .text, which makes the text the abbreviation.
+        .text(function(d) {
+            return d.abbr;
+        })
+        // Now place the text using our scale.
+        .attr("dx", function(d) {
+            return xScale(d[curX]);
+        })
+        .attr("dy", function(d) {
+            // When the size of the text is the radius,
+            // adding a third of the radius to the height
+            // pushes it into the middle of the circle.
+            return yScale(d[curY]) + circleRadius / 2.5;
+        })
+        .attr("font-size", circleRadius)
+        .attr("class", "stateText")
+}       
+
 
 
 // function visualize(data){
 //     let currentX = "poverty"
-//     let crrentY = "obesity"
+//     let currentY = "obesity"
 
 //     //x values
 //     let xMin
@@ -124,22 +219,22 @@ xaxisText
 //     let yMax
 
 //     let toolTip = d3
-//                 .tip()
-//                 .attr("class", "d3-tip")
-//                 .offset(40, -60)
-//                 .html(function(data){
-//                     //the x key
-//                     let theX
-//                     let theState = `<div>${data.state}</div>`
-//                     let theY = `<div>${currentY}:${data[currentY]}%</div>`
-//                     if(currentY === "poverty"){
-//                         theX = `<div>${currentX}:${data[currentX]}</div>`
-//                     }
-//                     else {
-//                         theX = `<div>${currentX}:${data[currentX]}</div>`
-//                     }
-//                     return theState + theX + theY
-//                 })
+//         .tip()
+//         .attr("class", "d3-tip")
+//         .offset(40, -60)
+//         .html(function(data){
+//             //the x key
+//             let theX
+//             let theState = `<div>${data.state}</div>`
+//             let theY = `<div>${currentY}:${data[currentY]}%</div>`
+//             if(currentY === "poverty"){
+//                 theX = `<div>${currentX}:${data[currentX]}</div>`
+//             }
+//             else {
+//                 theX = `<div>${currentX}:${data[currentX]}</div>`
+//             }
+//             return theState + theX + theY
+//         })
 
 //     svg.call(toolTip)
 
